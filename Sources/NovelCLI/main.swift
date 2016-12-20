@@ -29,7 +29,7 @@ struct DatabaseTask {
   let user: String
   let password: String
   let database: String
-  let port: Int
+  let port: String
 
   func execute() throws {
     let samplePath = "\(root)/Config/postgresql-sample.json"
@@ -43,41 +43,61 @@ struct DatabaseTask {
     contents = contents.replacingOccurrences(of: "{user}", with: user)
     contents = contents.replacingOccurrences(of: "{password}", with: password)
     contents = contents.replacingOccurrences(of: "{database}", with: database)
-    contents = contents.replacingOccurrences(of: "\"{port}\"", with: "\(port)")
+    contents = contents.replacingOccurrences(of: "\"{port}\"", with: port)
 
     let file = try open(forWriting: destPath)
     file.print(contents)
   }
 }
 
-let newCommand = command(
-  Option("name", "blog", description: "Your app's name."),
-  Option("host", "127.0.0.1", description: "PostgreSQL server address."),
-  Option("user", "postgres", description: "PostgreSQL db user."),
-  Option("password", "", description: "PostgreSQL db password."),
-  Option("database", "blog", description: "PostgreSQL database name."),
-  Option("port", 5432, description: "The TCP port of web server.")
-) { name, host, user, password, database, port in
-  print("Cloning template...")
-  try runAndPrint(bash: "git clone https://github.com/vadymmarkov/novel-template \(name)")
-  try runAndPrint(bash: "swift build --chdir \(name)")
-
-  print("Copying assets...")
-  try AssetTask(root: name).execute()
-
-  print("Configuring database...")
-  try DatabaseTask(root: name, host: host, user: user, password: password,
-                   database: database, port: port).execute()
+func readInput() -> String {
+  var string = main.stdin.readSome()?.trimmingCharacters(in: .whitespaces)
+  string = string?.replacingOccurrences(of: "\n", with: "")
+  return string ?? ""
 }
 
-let main = Group {
-  $0.addCommand("new", newCommand)
+let novel = Group {
+  $0.command("new") { (name: String) in
+    main.stdout.print("Cloning template...")
+    try runAndPrint(bash: "git clone https://github.com/vadymmarkov/novel-template \(name)")
+    try runAndPrint(bash: "swift build --chdir \(name)")
+
+    main.stdout.print("Copying assets...")
+    try AssetTask(root: name).execute()
+
+    main.stdout.print("Would you like to configure database? Yes/No")
+    let answer = readInput()
+
+    guard answer.lowercased() == "yes" else {
+      main.stdout.print("Setup completed")
+      return
+    }
+
+    main.stdout.print("PostgreSQL server address (127.0.0.1 by default)")
+    let host = readInput()
+
+    main.stdout.print("PostgreSQL database user.")
+    let user = readInput()
+
+    main.stdout.print("PostgreSQL database password")
+    let password = readInput()
+
+    main.stdout.print("PostgreSQL database name.")
+    let database = readInput()
+
+    main.stdout.print("PostgreSQL port.")
+    let port = readInput()
+
+    main.stdout.print("Configuring database...")
+    try DatabaseTask(root: name, host: host, user: user, password: password,
+                     database: database, port: port).execute()
+  }
 
   $0.command("update") {
-    print("Updating Novel")
+    main.stdout.print("Updating Novel")
     try runAndPrint(bash: "swift package update")
     try AssetTask(root: ".").execute()
   }
 }
 
-main.run()
+novel.run()
