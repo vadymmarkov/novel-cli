@@ -53,7 +53,7 @@ let newCommand = command(
   Option("user", "postgres", description: "PostgreSQL db user."),
   Option("password", "", description: "PostgreSQL db password."),
   Option("database", "blog", description: "PostgreSQL database name."),
-  Option("port", 3000, description: "The TCP port of web server.")
+  Option("port", 5432, description: "The TCP port of web server.")
 ) { name, host, user, password, database, port in
   print("Cloning template...")
   try runAndPrint(bash: "git clone https://github.com/vadymmarkov/novel-template \(name)")
