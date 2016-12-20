@@ -8,6 +8,13 @@
 
 [Novel](https://github.com/hyperoslo/novel) command line interface.
 
+# Usage
+
+```sh
+curl https://github.com/vadymmarkov/novel-cli/releases/download/0.1.0/novel
+chmod +x novel
+```
+
 ## Author
 
 Hyper Interaktiv AS, ios@hyper.no
