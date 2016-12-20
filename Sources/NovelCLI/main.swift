@@ -20,17 +20,60 @@ struct AssetTask {
   }
 }
 
-Group {
-  $0.command("new") { (name: String) in
-    print("Cloning template...")
-    try runAndPrint(bash: "git clone https://github.com/vadymmarkov/novel-template \(name)")
-    try runAndPrint(bash: "swift build --chdir \(name)")
-    try AssetTask(root: name).execute()
+struct DatabaseTask {
+  let root: String
+  let host: String
+  let user: String
+  let password: String
+  let database: String
+  let port: Int
+
+  func execute() throws {
+    let samplePath = "\(root)/Config/postgresql-sample.json"
+    let destPath = "\(root)/Config/secrets/postgresql.json"
+
+    try runAndPrint(bash: "touch \(destPath)")
+    let sampleFile = try open(samplePath)
+    var contents: String = sampleFile.read()
+    contents = contents.replacingOccurrences(of: "{host}", with: host)
+    contents = contents.replacingOccurrences(of: "{user}", with: host)
+    contents = contents.replacingOccurrences(of: "{password}", with: host)
+    contents = contents.replacingOccurrences(of: "{database}", with: database)
+    contents = contents.replacingOccurrences(of: "\"{post}\"", with: "\(port)")
+
+    let file = try open(forWriting: destPath)
+    file.print(contents)
   }
+}
+
+let newCommand = command(
+  Option("name", "blog", description: "Your app's name."),
+  Option("host", "127.0.0.1", description: "PostgreSQL server address."),
+  Option("user", "postgres", description: "PostgreSQL db user."),
+  Option("password", "", description: "PostgreSQL db password."),
+  Option("database", "blog", description: "PostgreSQL database name."),
+  Option("port", 3000, description: "The TCP port of web server.")
+) { name, host, user, password, database, port in
+  print("Cloning template...")
+  try runAndPrint(bash: "git clone https://github.com/vadymmarkov/novel-template \(name)")
+  try runAndPrint(bash: "swift build --chdir \(name)")
+
+  print("Copying assets...")
+  try AssetTask(root: name).execute()
+
+  print("Configuring database...")
+  try DatabaseTask(root: name, host: host, user: user, password: password,
+                   database: database, port: port).execute()
+}
+
+let main = Group {
+  $0.addCommand("new", newCommand)
 
   $0.command("update") {
     print("Updating Novel")
     try runAndPrint(bash: "swift package update")
     try AssetTask(root: ".").execute()
   }
-}.run()
+}
+
+main.run()
