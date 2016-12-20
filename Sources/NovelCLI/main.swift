@@ -17,6 +17,8 @@ struct AssetTask {
     try runAndPrint(bash: "cp -a \(root)/Packages/Novel-*/Public/images/. \(root)/Public/images")
     try runAndPrint(bash: "cp \(root)/Packages/Novel-*/Public/js/vendor.js \(root)/Public/js")
     try runAndPrint(bash: "cp \(root)/Packages/Novel-*/Public/js/admin.js \(root)/Public/js")
+
+    try runAndPrint(bash: "cp -rf \(root)/Packages/Novel-*/Resources/Views/admin \(root)/Resources/Views")
   }
 }
 
