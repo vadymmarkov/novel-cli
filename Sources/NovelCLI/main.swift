@@ -15,8 +15,8 @@ struct AssetTask {
     try runAndPrint(bash: "cp \(root)/Packages/Novel-*/Public/css/admin.css \(root)/Public/css")
     try runAndPrint(bash: "cp -a \(root)/Packages/Novel-*/Public/fonts/. \(root)/Public/fonts")
     try runAndPrint(bash: "cp -a \(root)/Packages/Novel-*/Public/images/. \(root)/Public/images")
-    try runAndPrint(bash: "cp \(root)/Packages/Novel-*/Public/js/vendor.css \(root)/Public/js")
-    try runAndPrint(bash: "cp \(root)/Packages/Novel-*/Public/js/admin.css \(root)/Public/js")
+    try runAndPrint(bash: "cp \(root)/Packages/Novel-*/Public/js/vendor.js \(root)/Public/js")
+    try runAndPrint(bash: "cp \(root)/Packages/Novel-*/Public/js/admin.js \(root)/Public/js")
   }
 }
 
@@ -32,14 +32,15 @@ struct DatabaseTask {
     let samplePath = "\(root)/Config/postgresql-sample.json"
     let destPath = "\(root)/Config/secrets/postgresql.json"
 
-    try runAndPrint(bash: "touch \(destPath)")
+    try runAndPrint(bash: "mkdir -p \(root)/Config/secrets")
+
     let sampleFile = try open(samplePath)
     var contents: String = sampleFile.read()
     contents = contents.replacingOccurrences(of: "{host}", with: host)
-    contents = contents.replacingOccurrences(of: "{user}", with: host)
-    contents = contents.replacingOccurrences(of: "{password}", with: host)
+    contents = contents.replacingOccurrences(of: "{user}", with: user)
+    contents = contents.replacingOccurrences(of: "{password}", with: password)
     contents = contents.replacingOccurrences(of: "{database}", with: database)
-    contents = contents.replacingOccurrences(of: "\"{post}\"", with: "\(port)")
+    contents = contents.replacingOccurrences(of: "\"{port}\"", with: "\(port)")
 
     let file = try open(forWriting: destPath)
     file.print(contents)
