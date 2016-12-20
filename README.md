@@ -11,7 +11,7 @@
 # Usage
 
 ```sh
-curl https://github.com/vadymmarkov/novel-cli/releases/download/0.1.0/novel
+curl https://github.com/hyperoslo/novel-cli/releases/download/0.1.0/novel
 chmod +x novel
 ```
 
