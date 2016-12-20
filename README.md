@@ -21,7 +21,9 @@ Hyper Interaktiv AS, ios@hyper.no
 
 ## Credits
 
-**Novel CLI** is built in [Commander](https://github.com/kylef/Commander).
+**Novel CLI** uses [Commander](https://github.com/kylef/Commander) and
+[SwiftShell](https://github.com/kareman/SwiftShell.git) to build command line
+interface.
 
 ## Contributing
 
