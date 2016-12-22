@@ -10,8 +10,9 @@
 
 # Usage
 
+Download https://github.com/vadymmarkov/novel-cli/releases/download/0.1.0/novel
+
 ```sh
-curl https://github.com/vadymmarkov/novel-cli/releases/download/0.1.0/novel
 chmod +x novel
 ./novel --help
 ./novel new blog
